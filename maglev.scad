@@ -16,17 +16,18 @@ duplo_bottom_4_low();
 module duplo_bottom_4_high() {
   len = 4;
   mag_y = (duploRaster*len-gapBetweenBricks)/4;
-  th = magnet_h;
+  th = magnet_h+0.7+0.6;
   difference() {
     union() {
-      translate([0,0,-8.7])
+      translate([0,0,-6])
         duplo(1,len,1,0);
       translate([0,0,-th/2])
-        color("red") cube([duploRaster-gapBetweenBricks,duploRaster*len-gapBetweenBricks,th], center=true);
+        cube([duploRaster-gapBetweenBricks,duploRaster*len-gapBetweenBricks,th], center=true);
     }
     translate([0,mag_y/2,delta]) {
       translate([0, +mag_y*1, 0]) magnet_pit();
-      translate([0, -mag_y*1, 0]) magnet_pit()
+      translate([0, 0, 0]) magnet_pit();
+      translate([0, -mag_y*1, 0]) magnet_pit();
       translate([0, -mag_y*2, 0]) magnet_pit();
     }
   }
