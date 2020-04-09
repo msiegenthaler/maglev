@@ -9,13 +9,17 @@ magnet_l = 15;
 
 
 
+// duplo_bottom(4, 3);
+// duplo_top_straight(4, 3);
+duplo_top_cross(2, 4);
+// duplo_top_cross(4, 8);
+
 //magnet();
-// duplo_bottom_4_high();
-duplo_bottom_4_low();
+//test_stripe();
 
-module duplo_bottom_4_high() {
-  len = 4;
-  mag_y = (duploRaster*len-gapBetweenBricks)/4;
+// Duplo stick of size lenx1 that contains count magnets and attaches to the bottom
+module duplo_bottom(len=4, count=3) {
+  mag_y = (duploRaster*len-gapBetweenBricks)/count;
   th = magnet_h+0.7+0.6;
   difference() {
     union() {
@@ -24,33 +28,45 @@ module duplo_bottom_4_high() {
       translate([0,0,-th/2])
         cube([duploRaster-gapBetweenBricks,duploRaster*len-gapBetweenBricks,th], center=true);
     }
-    translate([0,mag_y/2,delta]) {
-      translate([0, +mag_y*1, 0]) magnet_pit();
-      translate([0, 0, 0]) magnet_pit();
-      translate([0, -mag_y*1, 0]) magnet_pit();
-      translate([0, -mag_y*2, 0]) magnet_pit();
-    }
-  }
-}
-module duplo_bottom_4_low() {
-  len = 4;
-  mag_y = (duploRaster*len-gapBetweenBricks)/3;
-  th = magnet_h+0.7+0.6;
-  difference() {
-    union() {
-      translate([0,0,-6])
-        duplo(1,len,1,0);
-      translate([0,0,-th/2])
-        cube([duploRaster-gapBetweenBricks,duploRaster*len-gapBetweenBricks,th], center=true);
-    }
-    translate([0,0,delta]) {
-      translate([0, +mag_y*1, 0]) magnet_pit();
-      magnet_pit();
-      translate([0, -mag_y*1, 0]) magnet_pit();
+    for (i=[0:count-1]) {
+      translate([0, +mag_y*((count-1)/2-i), delta]) magnet_pit();
     }
   }
 }
 
+// Duplo stick of size lenx1 that contains count magnets and attaches to the top
+module duplo_top_straight(len=4, count=3) {
+  mag_y = (duploRaster*len-gapBetweenBricks)/count;
+  th = magnet_h+0.7+0.6;
+  difference() {
+    union() {
+      translate([0,0,1]) rotate([180,0,0]) duplo(1, len, 0, 1);
+      translate([0,0,th/2])
+      cube([duploRaster-gapBetweenBricks,duploRaster*len-gapBetweenBricks,th], center=true);
+    }
+    for (i=[0:count-1]) {
+      translate([0, +mag_y*((count-1)/2-i), th+delta]) magnet_pit();
+    }
+  }
+}
+
+// Duplo stick of size lenx2 that contains count magnets and attaches to the top
+module duplo_top_cross(len=4, count=6) {
+  mag_y = (duploRaster*len-gapBetweenBricks)/count;
+  th = magnet_h+0.7+0.6;
+  difference() {
+    union() {
+      translate([0,0,1]) rotate([180,0,0]) duplo(2, len, 0, 1);
+      translate([0,0,th/2])
+        cube([duploRaster*2-gapBetweenBricks,duploRaster*len-gapBetweenBricks,th], center=true);
+    }
+    translate([-duploRaster/2+0.6,0,th+delta]) {
+      for (i=[0:count-1]) {
+        #translate([0, +mag_y*((count-1)/2-i), 0]) rotate([0,0,90]) magnet_pit();
+      }
+    }
+  }
+}
 
 module test_stripe() {
   wall = 1;
