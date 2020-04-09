@@ -11,8 +11,9 @@ magnet_l = 15;
 
 // duplo_bottom(4, 3);
 // duplo_top_straight(4, 3);
-duplo_top_cross(2, 4);
+// duplo_top_cross(2, 4);
 // duplo_top_cross(4, 8);
+duplo_vert_vert(2,4);
 
 //magnet();
 //test_stripe();
@@ -51,7 +52,7 @@ module duplo_top_straight(len=4, count=3) {
 }
 
 // Duplo stick of size lenx2 that contains count magnets and attaches to the top
-module duplo_top_cross(len=4, count=6) {
+module duplo_top_cross(len=4, count=8) {
   mag_y = (duploRaster*len-gapBetweenBricks)/count;
   th = magnet_h+0.7+0.6;
   difference() {
@@ -62,8 +63,28 @@ module duplo_top_cross(len=4, count=6) {
     }
     translate([-duploRaster/2+0.6,0,th+delta]) {
       for (i=[0:count-1]) {
-        #translate([0, +mag_y*((count-1)/2-i), 0]) rotate([0,0,90]) magnet_pit();
+        translate([0, +mag_y*((count-1)/2-i), 0]) rotate([0,0,90]) magnet_pit();
       }
+    }
+  }
+}
+
+// Duplo stick of size lenx1x2 that contains count vertical magnets and attaches to the bottom
+module duplo_vert_vert(len=2, count=4) {
+  mag_y = (duploRaster*len-gapBetweenBricks)/count;
+  th = duploHeight*2;
+  dz = 0;
+  *translate([0,0,-duploRaster/2+dz+3.7])
+    cube([duploRaster-gapBetweenBricks, duploRaster*2-gapBetweenBricks, 2*duploHeight-gapBetweenBricks], center=true);
+  difference() {
+    union() {
+      translate([0,0,-dz-duploHeight/2])
+        duplo(1,len,3,1);
+      translate([duploRaster/4,0,-th/2+duploHeight])
+        cube([duploRaster/2-gapBetweenBricks,duploRaster*len-gapBetweenBricks,th], center=true);
+    }
+    for (i=[0:count-1]) {
+      translate([duploRaster/2-gapBetweenBricks/2+delta, +mag_y*((count-1)/2-i), 0]) rotate([90,0,90]) magnet_pit();
     }
   }
 }
