@@ -25,30 +25,27 @@ module duplo_bottom_4_high() {
         color("red") cube([duploRaster-gapBetweenBricks,duploRaster*len-gapBetweenBricks,th], center=true);
     }
     translate([0,mag_y/2,delta]) {
-      translate([0, +mag_y*1, 0]) magnet_pit(hole_l=5);
-      magnet_pit(hole_l=5);
-      translate([0, -mag_y*1, 0]) magnet_pit(hole_l=5);
-      translate([0, -mag_y*2, 0]) magnet_pit(hole_l=5);
+      translate([0, +mag_y*1, 0]) magnet_pit();
+      translate([0, -mag_y*1, 0]) magnet_pit()
+      translate([0, -mag_y*2, 0]) magnet_pit();
     }
   }
 }
 module duplo_bottom_4_low() {
   len = 4;
   mag_y = (duploRaster*len-gapBetweenBricks)/3;
-  th = magnet_h;
+  th = magnet_h+0.7+0.6;
   difference() {
     union() {
-      translate([0,0,-8.7])
+      translate([0,0,-6])
         duplo(1,len,1,0);
       translate([0,0,-th/2])
-        color("red") cube([duploRaster-gapBetweenBricks,duploRaster*len-gapBetweenBricks,th], center=true);
+        cube([duploRaster-gapBetweenBricks,duploRaster*len-gapBetweenBricks,th], center=true);
     }
     translate([0,0,delta]) {
-      translate([0, +mag_y*1, 0]) magnet_pit(hole_l=5);
+      translate([0, +mag_y*1, 0]) magnet_pit();
       magnet_pit();
-      translate([0, -5, -8]) cylinder(5, d=2);
-      translate([0, 5, -8]) cylinder(5, d=2);
-      translate([0, -mag_y*1, 0]) magnet_pit(hole_l=5);
+      translate([0, -mag_y*1, 0]) magnet_pit();
     }
   }
 }
@@ -74,7 +71,7 @@ module magnet_pit(hole_l=0) {
   gap_w=0.03; gap_l=0.15; gap_h=0.2;
   w = magnet_w+2*gap_w; l = magnet_l+2*gap_l*2; h = magnet_h+2*gap_h;
   teeth_inset = 0.5; teeth_width = 3; teeth_thickness = 0.3;
-  tf_w = 0.5; tf_l = 0.8;
+  tf_w = 1; tf_l = 0.0;
   union() {
     translate([0,0,-h/2-teeth_thickness+delta])
       cube([w, l, h], center=true);
@@ -82,10 +79,14 @@ module magnet_pit(hole_l=0) {
       difference() {
         cube([w,l,teeth_thickness], center=true);
         translate([0,0,0.01]) {
-          translate([-(w-teeth_inset)/2-delta,0,0]) cube([teeth_inset,l*tf_l,teeth_thickness], center=true);
-          translate([(w-teeth_inset)/2+delta,0,0]) cube([teeth_inset,l*tf_l,teeth_thickness], center=true);
-          translate([0,-(l-teeth_inset)/2-delta,0]) cube([w*tf_w,teeth_inset,teeth_thickness], center=true);
-          translate([0,(l-teeth_inset)/2+delta,0]) cube([w*tf_w,teeth_inset,teeth_thickness], center=true);
+          translate([-(w-teeth_inset)/2-delta,-l/4,0]) cube([teeth_inset,tf_w,teeth_thickness], center=true);
+          translate([-(w-teeth_inset)/2-delta,0,0]) cube([teeth_inset,tf_w,teeth_thickness], center=true);
+          translate([-(w-teeth_inset)/2-delta,l/4,0]) cube([teeth_inset,tf_w,teeth_thickness], center=true);
+          translate([(w-teeth_inset)/2-delta,-l/4,0]) cube([teeth_inset,tf_w,teeth_thickness], center=true);
+          translate([(w-teeth_inset)/2-delta,0,0]) cube([teeth_inset,tf_w,teeth_thickness], center=true);
+          translate([(w-teeth_inset)/2-delta,l/4,0]) cube([teeth_inset,tf_w,teeth_thickness], center=true);
+          translate([0,-(l-teeth_inset)/2-delta,0]) cube([tf_w,teeth_inset,teeth_thickness], center=true);
+          translate([0,(l-teeth_inset)/2+delta,0]) cube([tf_w,teeth_inset,teeth_thickness], center=true);
         }
       }
     }
