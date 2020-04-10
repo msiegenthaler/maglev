@@ -13,7 +13,9 @@ magnet_l = 15;
 // duplo_top_straight(4, 3);
 // duplo_top_cross(2, 4);
 // duplo_top_cross(4, 8);
-duplo_vert_vert(2,4);
+// duplo_vert_vert(2, 4);
+duplo_railholder_a(4, 4, 2);
+
 
 //magnet();
 //test_stripe();
@@ -88,6 +90,44 @@ module duplo_vert_vert(len=2, count=4) {
     }
   }
 }
+
+// railholder with arms that are l+r on top of the rail
+module duplo_railholder_a(len, magnet_count, arm_count) {
+  arm_w = 10;
+  module arm(alpha, k) {
+    block_h = magnet_h+1.3;
+    inner_h = 14.5;       inner_w=inner_h/tan(alpha);
+    mag_hold_depth = 5.1; mag_holder_x=mag_hold_depth*sin(alpha); mag_holder_y=mag_hold_depth*cos(alpha);
+    translate([(duploRaster-gapBetweenBricks)/2,0,0]) {
+      difference() {
+        rotate([90,0,0]) linear_extrude(arm_w, center=true) {
+          polygon([[0,0], [0,block_h], [inner_w,inner_h+block_h],
+                  [inner_w+mag_holder_x, inner_h+block_h-mag_holder_y],
+                  [mag_hold_depth*cos(90-alpha), 0],
+                  [0,0]]);
+        }
+        rotate([0, -alpha, 0]) translate([13,0,2.7+k]) rotate([0,0,90]) magnet_pit();
+      }
+    }
+  }
+
+  y_total = (duploRaster*len-gapBetweenBricks)-arm_w;
+  union() {
+    duplo_top_straight(len, magnet_count);
+    if (arm_count == 1) {
+      arm(55, 0.4);
+      mirror([1,0,0]) arm(55, 0.4);
+    } else {
+      for (i=[1:arm_count]) {
+        translate([0,y_total/2-y_total/(arm_count-1)*(i-1),0]) {
+          arm(55, 0.4);
+          mirror([1,0,0]) arm(55, 0.4);
+        }
+      }
+    }
+  }
+}
+
 
 module test_stripe() {
   wall = 1;
