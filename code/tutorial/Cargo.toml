@@ -1,0 +1,14 @@
+[package]
+name = "tutorial"
+version = "0.1.0"
+authors = ["Mario Siegenthaler <mario.siegenthaler@linkyard.ch>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+embedded-hal = "0.2.3"
+linux-embedded-hal = "0.3.0"
+embedded-graphics = "0.6.1"
+st7735-lcd = "0.7.0"
+st7735 = "0.1.0"
