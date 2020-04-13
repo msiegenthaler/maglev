@@ -14,8 +14,14 @@ magnet_l = 15;
 // duplo_top_cross(2, 4);
 // duplo_top_cross(4, 8);
 // duplo_vert_vert(2, 4);
-duplo_railholder_a(4, 4, 2);
+// duplo_railholder_a(4, 4, 2);
+// translate([0,0,30])
+  // duplo_bottom(4, 3);
 
+rotate([0,90,0]) {
+  soleniod(3, 1.5, left=true);
+  translate([0,25,0]) soleniod(3, 1.5, left=false);
+}
 
 //magnet();
 //test_stripe();
@@ -125,6 +131,25 @@ module duplo_railholder_a(len, magnet_count, arm_count) {
         }
       }
     }
+  }
+}
+
+module soleniod(size=1, len=1, left=false) {
+  inside_d = 6.2+1*(size-1); outside_d = 12+4*(size-1);
+  wall = 1.2; side_wall=0.8; gap = 0.08;
+  w = duploRaster*len-2*0.6;
+  holder_w = 2;
+  rotate([0,90,0]) difference() {
+    union() {
+      cylinder(w/2, d=inside_d, center=true);
+      translate([0,0,w/4-side_wall/2]) cylinder(side_wall, d=outside_d, center=true);
+      if (!left)
+        translate([0,0,-w/4-holder_w/2+gap]) cylinder(holder_w-gap*2, d=inside_d-wall, center=true);
+    }
+    if (left) {
+      translate([0,0,-w/4+holder_w/2-delta]) cylinder(holder_w+2*delta, d=inside_d-wall-gap, center=true);
+    }
+    translate([0,0,delta-holder_w/2]) cylinder(w/2+delta*4+holder_w, d=inside_d-wall*2, center=true);
   }
 }
 
