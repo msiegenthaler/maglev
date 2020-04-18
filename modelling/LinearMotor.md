@@ -17,12 +17,14 @@ Answer: No, it does not make any difference at all
 see [Experiment 2](E2/E2_IronSheet.md)
 
 
-## E3: Effect of Magnet Spacing in Hallbach
+## E3: Effect of Magnet Spacing in Hallbach Array
 Question: How much does adding empty space between the strator magnets lessen the magnetic field?
 
 Motivation: obviously using less magnets would be beneficial because it's less expensive
 
-Answer: TBD
+Answer: Field strength changes approx. linearly with gap with ~0.083 T/mm and at 6mm its no longer continuous but has a "bump".
+
+see [Experiment 3](E3/E3_Spacing.md)
 
 ## E4: Solenoid Orientation
 Question: Which orientation of the soleniod does make most sense in regards to providing x-axis force?
