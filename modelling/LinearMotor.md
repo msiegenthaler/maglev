@@ -29,9 +29,11 @@ see [Experiment 3](E3/E3_Spacing.md)
 ## E4: Solenoid Orientation
 Question: Which orientation of the soleniod does make most sense in regards to providing x-axis force?
 
-Answer: TBD
+Answer: horizontally aligned solenoid (N facing left/right) is better by approx. 20%
 
-## E5: Impact of Solenoid on fields
+see [Experiment 4](E4/E4_Orientation.md)
+
+## E5: Impact of Solenoid length on fields
 Question: How much does the length of the solenoid affect the x-axis force given the same number of turns per mm? (in general)
 
 (depends on the best orientation for E4)
