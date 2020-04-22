@@ -8,7 +8,8 @@ edition = "2018"
 
 [dependencies]
 embedded-hal = "0.2.3"
-linux-embedded-hal = "0.3.0"
 embedded-graphics = "0.6.1"
+linux-embedded-hal = {version = "0.3.0"}
 st7735-lcd = "0.7.0"
 st7735 = "0.1.0"
+concread = "0.1.8"

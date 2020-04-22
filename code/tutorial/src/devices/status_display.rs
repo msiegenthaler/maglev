@@ -1,3 +1,5 @@
+use crate::distance::Distance;
+use crate::utils::ExportableWait;
 use embedded_graphics::fonts::{Font6x8, Font8x16, Text};
 use embedded_graphics::pixelcolor::Rgb565;
 use embedded_graphics::prelude::*;
@@ -32,7 +34,7 @@ impl StatusDisplay {
             Error::InitializationFailed("Could not initialize the display".to_string())
         })?;
         display
-            .set_orientation(&Orientation::Landscape)
+            .set_orientation(&Orientation::LandscapeSwapped)
             .map_err(|_| Error::InitializationFailed("Could not set orientation".to_string()))?;
         let mut r = StatusDisplay { display };
         r.clear()?;
@@ -51,12 +53,15 @@ impl StatusDisplay {
             .map_err(|_| Error::DrawingError("could not clear the screen".to_string()))
     }
 
-    pub fn set_number(&mut self, num: i32) -> Result<(), Error> {
+    pub fn set_distance(&mut self, distance: &Option<Distance>) -> Result<(), Error> {
         let style = TextStyleBuilder::new(Font8x16)
             .text_color(Rgb565::RED)
             .background_color(Rgb565::BLACK)
             .build();
-        let text = format!("# {}", num);
+        let text = match distance {
+            Some(d) => format!("d: {0:>5.1} cm", d.as_centimetre()).to_string(),
+            None => "d: unknown".to_string(),
+        };
         Text::new(&text, Point::new(10, 10))
             .into_styled(style)
             .draw(&mut self.display)
@@ -69,8 +74,7 @@ impl StatusDisplay {
             .text_color(Rgb565::GREEN)
             .background_color(Rgb565::BLACK)
             .build();
-        let text = format!("Hi {}", name);
-        Text::new(&text, Point::new(10, 30))
+        Text::new(name, Point::new(10, 30))
             .into_styled(style)
             .draw(&mut self.display)
             .map_err(|_| Error::DrawingError("failed to draw text (name)".to_string()))?;
@@ -80,7 +84,7 @@ impl StatusDisplay {
 
 fn open_pin(num: u64) -> Result<Pin, Error> {
     let pin = Pin::new(num);
-    pin.export()
+    pin.ensure_exported()
         .map_err(|e| Error::InitializationFailed(e.to_string()))?;
     pin.set_direction(Direction::Out)
         .map_err(|e| Error::InitializationFailed(e.to_string()))?;

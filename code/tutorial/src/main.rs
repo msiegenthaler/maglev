@@ -1,20 +1,23 @@
 use std::thread;
 use std::time::Duration;
-
-use tutorial::status_display::StatusDisplay;
+use tutorial::devices::distance_sensor::DistanceSensor;
+use tutorial::visualize_status::VisualizeStatus;
 
 fn main() {
     println!("initializing...");
-    let mut display = StatusDisplay::new().unwrap();
+    let distance_sensor = DistanceSensor::new(20, 21).unwrap();
+    let status = VisualizeStatus::start().unwrap();
     println!("initialized.");
 
-    display.set_name("Marcus").unwrap();
-    let mut x = 1;
     loop {
-        display.set_number(x).unwrap();
-        println!("Number is {}", x);
+        match distance_sensor.measure_range() {
+            Ok(distance) => status.set_distance(Some(distance)),
+            Err(e) => {
+                println!("Measurement failed {:?}", e);
+                status.set_distance(None)
+            }
+        }
 
-        thread::sleep(Duration::from_millis(500));
-        x = x + 1;
+        thread::sleep(Duration::from_millis(10));
     }
 }
