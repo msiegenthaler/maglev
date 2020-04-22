@@ -11,7 +11,7 @@ fn main() {
     let status = VisualizeStatus::start().unwrap();
     println!("initialized.");
 
-    let log = true;
+    let log = false;
 
     let start_time = SystemTime::now();
     let distance = Measurer::start(
@@ -38,7 +38,7 @@ fn main() {
             }
         },
         MedianOverWindow::new(15),
-        Duration::from_millis(10),
+        Duration::from_millis(15),
     );
 
     loop {
