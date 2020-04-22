@@ -9,6 +9,7 @@ use std::time::{Duration, SystemTime};
 pub struct DistanceSensor {
     trigger_pin: Pin,
     echo_pin: Pin,
+    max_distance: Distance,
 }
 
 #[derive(Debug)]
@@ -17,11 +18,23 @@ pub enum Error {
     MeasurementFailed(String),
 }
 
+const SPEED_OF_SOUND: f64 = 343.5; // metres per second (at 20 degrees celsius)
+
 impl DistanceSensor {
-    pub fn new(trigger_pin: u64, echo_pin: u64) -> Result<DistanceSensor, Error> {
+    /**
+    * max_distance: use the max value that is interesting in your use case (and supported by
+     the hardware). Setting it to a small value will provide speed ups in case of errors, since
+      we don't waste time for echos that will never come.
+    */
+    pub fn new(
+        trigger_pin: u64,
+        echo_pin: u64,
+        max_distance: Distance,
+    ) -> Result<DistanceSensor, Error> {
         return Ok(DistanceSensor {
             trigger_pin: create_trigger_pin(trigger_pin)?,
             echo_pin: create_echo_pin(echo_pin)?,
+            max_distance,
         });
     }
 
@@ -43,23 +56,24 @@ impl DistanceSensor {
         let t0 = SystemTime::now();
 
         //Wait until the echo has been received
-        self.await_edge(Edge::FallingEdge, 37)?
+        let max_wait = self.max_distance.as_metre() * 2_f64 / SPEED_OF_SOUND * 1000_f64 * 1.5_f64;
+        self.await_edge(Edge::FallingEdge, max_wait as isize)?
             .ok_or(MeasurementFailed(
                 "Timeout while waiting for echo reception".to_string(),
             ))?;
+
         // Measure how long it took to receive the echo
         let duration = t0.elapsed().map_err(|e| {
             MeasurementFailed(format!("failed to measure the time interval: {}", e))
         })?;
 
-        let speed_of_sound = 343.5_f64; // metres per second (at 20 degrees celsius)
         let distance =
-            Distance::from_mm((speed_of_sound * duration.as_secs_f64() / 2_f64 * 1000_f64) as u64);
-        println!(
-            "Duration was {} us, so distance is {} cm",
-            duration.as_micros(),
-            distance.as_centimetre()
-        );
+            Distance::from_mm((SPEED_OF_SOUND * duration.as_secs_f64() / 2_f64 * 1000_f64) as u64);
+        if distance > self.max_distance {
+            return Err(MeasurementFailed(
+                "too far to measure or no echo received".to_string(),
+            ));
+        }
         Ok(distance)
     }
 

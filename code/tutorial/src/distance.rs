@@ -1,4 +1,4 @@
-#[derive(Clone, PartialEq, Copy)]
+#[derive(Clone, PartialEq, PartialOrd, Copy, Debug)]
 pub struct Distance(u64);
 
 impl Distance {
