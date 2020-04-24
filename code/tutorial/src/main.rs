@@ -4,35 +4,42 @@ use tutorial::devices::distance_sensor::DistanceSensor;
 use tutorial::distance::Distance;
 use tutorial::measurer::Measurer;
 use tutorial::visualize_status::VisualizeStatus;
-use tutorial::devices::zero_borg::ZeroBorg;
+use tutorial::devices::zero_borg::{ZeroBorg, Led, AnalogSource, Motor};
 use linux_embedded_hal::I2cdev;
 use std::thread;
+use tutorial::devices::hall_sensor::{HallSensor, FluxDensity};
+use tutorial::devices::Voltage;
 
 fn main() {
     println!("Starting...");
 
     let mut i2c = I2cdev::new("/dev/i2c-1").unwrap();
     let zero_borgs = ZeroBorg::scan(&mut i2c);
-    println!("{:?}", zero_borgs);
+    println!("-found {} zero borgs", zero_borgs.len());
     if zero_borgs.is_empty() {
         panic!("No ZeroBorg found");
     }
+    println!("Started");
 
-    let borg0_addr = *zero_borgs.get(0).unwrap();
-    let mut borg = ZeroBorg::new(i2c, borg0_addr);
+    let borg0_address = *zero_borgs.get(0).unwrap();
+    let mut borg = ZeroBorg::new(i2c, borg0_address);
+
+    let mut magnetic = HallSensor::new(FluxDensity::from_gauss(670.), Voltage::from_volts(3.3));
+
+    borg.set_led_value(Led::MainLed, true).unwrap();
+    borg.set_led_value(Led::IRLed, true).unwrap();
 
     loop {
-        println!("Turning on");
-        borg.set_led_value(true).unwrap();
-        println!("value read from borg {}", borg.get_led_value().unwrap());
+        let analog1 = borg.get_analog(AnalogSource::Analog1).unwrap().voltage();
 
-        thread::sleep(Duration::from_millis(500));
+        println!("values m={:.0} Gauss m1={:?} led={:?} ir_led={:?}",
+                 magnetic.value_as_flux_density(analog1).in_gauss(),
+                 borg.get_motor(Motor::Motor1).unwrap(),
+                 borg.get_led_value(Led::MainLed).unwrap(),
+                 borg.get_led_value(Led::IRLed).unwrap(),
+        );
 
-        println!("Turning off");
-        borg.set_led_value(false).unwrap();
-        println!("value read from borg {}", borg.get_led_value().unwrap());
-
-        thread::sleep(Duration::from_millis(500));
+        thread::sleep(Duration::from_millis(100));
     }
 }
 
