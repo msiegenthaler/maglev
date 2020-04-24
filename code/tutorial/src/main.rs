@@ -4,8 +4,40 @@ use tutorial::devices::distance_sensor::DistanceSensor;
 use tutorial::distance::Distance;
 use tutorial::measurer::Measurer;
 use tutorial::visualize_status::VisualizeStatus;
+use tutorial::devices::zero_borg::ZeroBorg;
+use linux_embedded_hal::I2cdev;
+use std::thread;
 
 fn main() {
+    println!("Starting...");
+
+    let mut i2c = I2cdev::new("/dev/i2c-1").unwrap();
+    let zero_borgs = ZeroBorg::scan(&mut i2c);
+    println!("{:?}", zero_borgs);
+    if zero_borgs.is_empty() {
+        panic!("No ZeroBorg found");
+    }
+
+    let borg0_addr = *zero_borgs.get(0).unwrap();
+    let mut borg = ZeroBorg::new(i2c, borg0_addr);
+
+    loop {
+        println!("Turning on");
+        borg.set_led_value(true).unwrap();
+        println!("value read from borg {}", borg.get_led_value().unwrap());
+
+        thread::sleep(Duration::from_millis(500));
+
+        println!("Turning off");
+        borg.set_led_value(false).unwrap();
+        println!("value read from borg {}", borg.get_led_value().unwrap());
+
+        thread::sleep(Duration::from_millis(500));
+    }
+}
+
+#[allow(dead_code)]
+fn main2() {
     println!("initializing...");
     let distance_sensor = DistanceSensor::new(20, 21, Distance::from_mm(1000)).unwrap();
     let status = VisualizeStatus::start().unwrap();
