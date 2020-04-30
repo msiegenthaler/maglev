@@ -100,7 +100,7 @@ impl<I2C, E> ZeroBorg<I2C>
 
     pub fn get_led_value(&mut self, led: Led) -> Result<bool, Error<E>> {
         let resp = self.ask(ReadCommand::get_led(led))?;
-        return Ok(resp[1] != 0);
+        Ok(resp[1] != 0)
     }
 
     pub fn set_led_value(&mut self, led: Led, value: bool) -> Result<(), Error<E>> {
@@ -119,6 +119,15 @@ impl<I2C, E> ZeroBorg<I2C>
 
     pub fn turn_everything_off(&mut self) -> Result<(), Error<E>> {
         self.send(WriteCommand::all_off())
+    }
+
+    pub fn get_emergency_power_off_state(&mut self) -> Result<bool, Error<E>> {
+        let resp = self.ask(ReadCommand::get_emergency_power_off())?;
+        Ok(resp[1] != 0)
+    }
+
+    pub fn reset_emergency_power_off(&mut self) -> Result<(), Error<E>> {
+        self.send(WriteCommand::reset_emergency_power_off())
     }
 
     pub fn get_analog(&mut self, analog: AnalogSource) -> Result<AnalogValue, Error<E>> {
@@ -179,6 +188,10 @@ pub(crate) mod command {
             }
         }
 
+        pub fn get_emergency_power_off() -> ReadCommand {
+            ReadCommand { code: 21 }
+        }
+
         pub fn execute<I2C, E>(&self, i2c: &mut I2C, address: &Address) -> Result<[u8; 4], Error<E>>
             where I2C: i2c::Write<Error=E> + i2c::Read<Error=E> {
             i2c
@@ -219,6 +232,13 @@ pub(crate) mod command {
             WriteCommand {
                 code: motor_offset(motor) + if power.is_backward() { 1 } else { 0 },
                 data: vec![power.0],
+            }
+        }
+
+        pub fn reset_emergency_power_off() -> WriteCommand {
+            WriteCommand {
+                code: 20,
+                data: vec![0],
             }
         }
 
