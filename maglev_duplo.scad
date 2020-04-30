@@ -6,11 +6,11 @@ delta = 0.005; //for better preview rendering. set to 0 for 'perfect'
 magnet_w = 4;
 magnet_h = 4;
 magnet_l = 15;
-magnet_cubic = 4;
+magnet_cubic = 5;
 
 
 
-duplo_rail(2);
+duplo_rail(4);
 // duplo_bottom(4, 3);
 // duplo_top_straight(4, 3);
 // duplo_top_cross(2, 4);
@@ -47,7 +47,7 @@ module duplo_bottom(len=4, count=3) {
 // Duplo stick of size lenx1 that contains magnets
 module duplo_rail(len=2) {
   assert(len % 2 == 0 && len >= 2, "invalid length, must be even");
-  mag_y = magnet_cubic * 2;
+  mag_y = magnet_cubic + (8 - magnet_cubic);
   count = duploRaster*len / mag_y;
   th = magnet_cubic+0.7+0.6;
   text_h = 0.2;
