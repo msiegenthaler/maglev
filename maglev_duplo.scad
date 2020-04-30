@@ -6,9 +6,11 @@ delta = 0.005; //for better preview rendering. set to 0 for 'perfect'
 magnet_w = 4;
 magnet_h = 4;
 magnet_l = 15;
+magnet_cubic = 4;
 
 
 
+duplo_rail(2);
 // duplo_bottom(4, 3);
 // duplo_top_straight(4, 3);
 // duplo_top_cross(2, 4);
@@ -16,12 +18,12 @@ magnet_l = 15;
 // duplo_vert_vert(2, 4);
 // duplo_railholder_a(4, 4, 2);
 // translate([0,0,30])
-  // duplo_bottom(4, 3);
+// duplo_bottom(4, 3);
 
-rotate([0,90,0]) {
-  soleniod(3, 1.5, left=true);
-  translate([0,25,0]) soleniod(3, 1.5, left=false);
-}
+// rotate([0,90,0]) {
+//   soleniod(3, 1.5, left=true);
+//   translate([0,25,0]) soleniod(3, 1.5, left=false);
+// }
 
 //magnet();
 //test_stripe();
@@ -40,6 +42,30 @@ module duplo_bottom(len=4, count=3) {
     for (i=[0:count-1]) {
       translate([0, +mag_y*((count-1)/2-i), delta]) magnet_pit();
     }
+  }
+}
+// Duplo stick of size lenx1 that contains magnets
+module duplo_rail(len=2) {
+  assert(len % 2 == 0 && len >= 2, "invalid length, must be even");
+  mag_y = magnet_cubic * 2;
+  count = duploRaster*len / mag_y;
+  th = magnet_cubic+0.7+0.6;
+  text_h = 0.2;
+  difference() {
+    union() {
+      translate([0,0,-6])
+        duplo(1,len,1,0);
+      translate([0,0,-th/2])
+        cube([duploRaster-gapBetweenBricks,duploRaster*len-gapBetweenBricks,th], center=true);
+    }
+    for (i=[0:count-1]) {
+      text = i % 4 == 3 ? "N" :
+             i % 4 == 1 ? "S" : "";
+      translate([0, +mag_y*((count-1)/2-i), delta]) magnet_pit_cubic();
+      translate([-magnet_cubic/2-1.5,+mag_y*((count-1)/2-i),-text_h+delta]) rotate([0,0,90])
+        linear_extrude(text_h) text(text, 2, halign="center", valign="bottom");
+    }
+
   }
 }
 
@@ -170,6 +196,7 @@ module test_stripe() {
   }
 }
 
+/** bar magnet */
 module magnet_pit(hole_l=0) {
   gap_w=0.03; gap_l=0.15; gap_h=0.2;
   w = magnet_w+2*gap_w; l = magnet_l+2*gap_l*2; h = magnet_h+2*gap_h;
@@ -188,6 +215,33 @@ module magnet_pit(hole_l=0) {
           translate([(w-teeth_inset)/2-delta,-l/4,0]) cube([teeth_inset,tf_w,teeth_thickness], center=true);
           translate([(w-teeth_inset)/2-delta,0,0]) cube([teeth_inset,tf_w,teeth_thickness], center=true);
           translate([(w-teeth_inset)/2-delta,l/4,0]) cube([teeth_inset,tf_w,teeth_thickness], center=true);
+          translate([0,-(l-teeth_inset)/2-delta,0]) cube([tf_w,teeth_inset,teeth_thickness], center=true);
+          translate([0,(l-teeth_inset)/2+delta,0]) cube([tf_w,teeth_inset,teeth_thickness], center=true);
+        }
+      }
+    }
+    if (hole_l > 0) {
+      translate([0,0,-h-hole_l/2-teeth_thickness+delta*2])
+        cylinder(hole_l, d=2, center=true);
+    }
+  }
+}
+
+/** Cubic magnet */
+module magnet_pit_cubic(hole_l=0) {
+  gap_w=0.05; gap_l=0.05; gap_h=0.2;
+  w = magnet_cubic+2*gap_w; l = magnet_cubic+2*gap_l*2; h = magnet_cubic+2*gap_h;
+  teeth_inset = 0.5; teeth_width = 3; teeth_thickness = 0.3;
+  tf_w = 1; tf_l = 0.0;
+  union() {
+    translate([0,0,-h/2-teeth_thickness+delta])
+      cube([w, l, h], center=true);
+    translate([0,0,-teeth_thickness/2]) {
+      difference() {
+        cube([w,l,teeth_thickness], center=true);
+        translate([0,0,0.01]) {
+          translate([-(w-teeth_inset)/2-delta,0,0]) cube([teeth_inset,tf_w,teeth_thickness], center=true);
+          translate([(w-teeth_inset)/2-delta,0,0]) cube([teeth_inset,tf_w,teeth_thickness], center=true);
           translate([0,-(l-teeth_inset)/2-delta,0]) cube([tf_w,teeth_inset,teeth_thickness], center=true);
           translate([0,(l-teeth_inset)/2+delta,0]) cube([tf_w,teeth_inset,teeth_thickness], center=true);
         }
