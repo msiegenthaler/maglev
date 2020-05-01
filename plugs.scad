@@ -2,7 +2,7 @@ plug_h = 9;
 plug_w = 18;
 plug_d = 9;
 plug_ratch_z = 2.7;
-plug_ratch_h = 3.4;
+plug_ratch_h = 3.3;
 plug_ratch_d = 6.7;
 plug_wall = 1.3;
 
@@ -30,7 +30,7 @@ module latch(height, width, depth) {
 
 module plug_holder() {
   wall = 0.5;
-  gap = 0.05;
+  gap = 0.075;
   stud_x = plug_wall-0.2;
 
   w = plug_w + 2*wall + 2*gap;
@@ -44,13 +44,13 @@ module plug_holder() {
       cube([plug_w-2*b_w, h-2*wall, plug_d*2], center=true);
     }
     translate([stud_x/2-w/2+wall,0,+plug_ratch_d/2-plug_d/2])
-      cube([stud_x, plug_ratch_h-gap, plug_ratch_d], center=true);
+      cube([stud_x, plug_ratch_h-gap*2, plug_ratch_d], center=true);
     translate([-plug_w/2-gap+stud_x,0,-plug_d/2+plug_ratch_z]) rotate([0,180,-90])
-      latch(0.5, 1, 0.2);
+      latch(0.5, 1, 0.3);
     translate([-stud_x/2+w/2-wall,0,+plug_ratch_d/2-plug_d/2])
-      cube([stud_x, plug_ratch_h-gap, plug_ratch_d], center=true);
+      cube([stud_x, plug_ratch_h-gap*2, plug_ratch_d], center=true);
     translate([plug_w/2+gap-stud_x,0,-plug_d/2+plug_ratch_z]) rotate([0,180,90])
-      latch(0.5, 1, 0.2);
+      latch(0.5, 1, 0.3);
   }
 
   // %plug();
