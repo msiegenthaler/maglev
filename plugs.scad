@@ -5,10 +5,15 @@ plug_ratch_z = 2.7;
 plug_ratch_h = 3.3;
 plug_ratch_d = 6.7;
 plug_wall = 1.3;
+plug_holder_wall = 0.5;
+plug_holder_gap = 0.075;
 
 delta = $preview ? 0.005 : 0; //for better preview rendering
-$fa = 1;
 
+plug_holder_y_offset = plug_h/2 + plug_holder_wall;
+plug_holder_y_size = plug_h + plug_holder_wall;
+plug_holder_x_size = plug_w + 2*plug_holder_wall + 2*plug_holder_gap;
+plug_holder_z_size = plug_d + 2*plug_holder_wall;
 
 module plug() {
   difference() {
@@ -29,11 +34,11 @@ module latch(height, width, depth) {
 }
 
 module plug_holder() {
-  wall = 0.5;
-  gap = 0.075;
+  wall = plug_holder_wall;
+  gap = plug_holder_gap;
   stud_x = plug_wall-0.2;
 
-  w = plug_w + 2*wall + 2*gap;
+  w = plug_holder_x_size;
   h = plug_h + 2*wall + 2*gap;
   b_w = 2;
   union() {
@@ -54,5 +59,11 @@ module plug_holder() {
   }
 
   // %plug();
-  
+}
+
+module plug_holder_box() {
+  w = plug_holder_x_size;
+  h = plug_holder_y_size+plug_holder_wall;
+  d = plug_d+plug_holder_wall;
+  translate([0,0,-plug_holder_wall/2]) cube([w,h,d], center=true);
 }

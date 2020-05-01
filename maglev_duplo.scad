@@ -1,17 +1,21 @@
 include <lib/duplo-block-lib.scad>
+include <plugs.scad>
 
 $fs = 0.1;
+delta = $preview ? 0.005 : 0; //for better preview rendering
 
-delta = 0.005; //for better preview rendering. set to 0 for 'perfect' 
 magnet_w = 4;
 magnet_h = 4;
 magnet_l = 15;
 magnet_cubic = 5;
 
+air_gap = 12; //levitation height above duplo_bottom
+side_gap = 5;    //expected gap between solenoid and rail
 
 
-duplo_rail(4);
-// duplo_bottom(4, 3);
+
+// duplo_rail(4);
+// duplo_bottom(4, 4);
 // duplo_top_straight(4, 3);
 // duplo_top_cross(2, 4);
 // duplo_top_cross(4, 8);
@@ -27,6 +31,65 @@ duplo_rail(4);
 
 //magnet();
 //test_stripe();
+
+levitator();
+*translate([0,-duploRaster/2,-duploHeight-air_gap]) rotate([0,0,90]) {
+  duplo_bottom(4,4);
+}
+
+// plug_holder();
+
+module levitator() {
+  z_magnet_offset = 9;
+  sensor_w = 4.05;  sensor_h = 3.2;  sensor_d = 1.6;
+  sensor_solenoid_gap = 19;
+  dw = 2;
+  wall = 0.5;
+  l_h_delta = 19;
+  l_h = air_gap+l_h_delta; l_d=duploRaster*2-side_gap-gapBetweenBricks/2;
+  plug_offset_z = -6;
+  bottom_box_h = l_h/2-plug_holder_z_size/2+plug_offset_z;
+  union() {
+    *translate([0,duploRaster/2,0]) {
+      duplo(dw,3,0, true, false);
+      translate([0,0,-duploHeight/2]) 
+        cube([dw*duploRaster-gapBetweenBricks, 3*duploRaster-gapBetweenBricks, duploHeight], center=true);
+    }
+    translate([0, l_d/2+side_gap, -duploHeight-l_h/2]) {
+      difference() {
+        cube([dw*duploRaster-gapBetweenBricks, l_d, l_h], center=true);
+        //make it hollow
+        translate([-2,0,delta+wall])
+          cube([dw*duploRaster-gapBetweenBricks-2*wall, l_d-2*wall, l_h-wall], center=true);
+        // Cutout for plug holder
+        translate([delta+plug_holder_y_offset-plug_holder_y_size+(dw*duploRaster-gapBetweenBricks)/2,0,plug_offset_z])
+          rotate([90,0,90]) plug_holder_box();
+      }
+      // Plug holder and podest
+      translate([(dw*duploRaster-gapBetweenBricks)/2,0,plug_offset_z]) {
+        translate([plug_holder_y_offset-plug_holder_y_size,0,0]) rotate([90,0,90])
+          plug_holder();
+        translate([-plug_holder_y_size/2,0,-plug_holder_z_size/2-bottom_box_h/2])
+          cube([plug_holder_y_size,plug_holder_x_size,bottom_box_h], center=true);
+      }
+
+      // Solenoid holder
+      solenoid_l=16+0.4; holder_h = l_h_delta-7; holder_w = 5;
+      translate([-duploRaster/2+1,solenoid_l/2,-l_h/2+wall+holder_h/2])
+        cube([holder_w,l_d-solenoid_l-wall,holder_h], center=true);
+    }
+  }
+  // Placeholders for separatly printed stuff
+  %translate([-duploRaster/2+1,side_gap,-duploHeight]) {
+    translate([0,0,-air_gap-z_magnet_offset]) {
+        translate([0,12.5,0]) rotate([0,0,90]) soleniod(size=2, len=1, left=true);
+        translate([0,4.5,0]) rotate([0,0,-90]) soleniod(size=2, len=1, left=false);
+    }
+    translate([sensor_solenoid_gap,sensor_d/2+wall,-air_gap-z_magnet_offset]) {
+      cube([sensor_w, sensor_d, sensor_h], center=true);
+    }
+  }
+}
 
 // Duplo stick of size lenx1 that contains count magnets and attaches to the bottom
 module duplo_bottom(len=4, count=3) {
@@ -161,9 +224,9 @@ module duplo_railholder_a(len, magnet_count, arm_count) {
 }
 
 module soleniod(size=1, len=1, left=false) {
-  inside_d = 6.2+1*(size-1); outside_d = 12+4*(size-1);
+  inside_d = 4.0; outside_d = 12+4*(size-1);
   wall = 1.2; side_wall=0.8; gap = 0.08;
-  w = duploRaster*len-2*0.6;
+  w = duploRaster*len;
   holder_w = 2;
   rotate([0,90,0]) difference() {
     union() {
