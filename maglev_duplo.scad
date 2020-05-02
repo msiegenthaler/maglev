@@ -33,7 +33,8 @@ side_gap = 5;    //expected gap between solenoid and rail
 //magnet();
 //test_stripe();
 
-levitator();
+levitator(top=false, bottom=true);
+*levitator(top=true, bottom=false);
 *translate([0,-duploRaster/2,-duploHeight-air_gap]) rotate([0,0,90]) {
   duplo_bottom(4,4);
 }
@@ -41,7 +42,7 @@ levitator();
 
 // plug_holder();
 
-module levitator() {
+module levitator(top=true, bottom=true) {
   z_magnet_offset = 9;
   sensor_w = 4.05;  sensor_h = 3.2;  sensor_d = 1.7;
   sensor_solenoid_gap = 18.3;
@@ -61,6 +62,58 @@ module levitator() {
       cube([dw*duploRaster-gapBetweenBricks, l_d, l_h], center=true);      
       translate([0,0,delta+wall])
         cube([dw*duploRaster-gapBetweenBricks-2*wall, l_d-2*wall, l_h-wall], center=true);
+    }
+  }
+  module tapering() {
+    inset=2;
+    w=dw*duploRaster-gapBetweenBricks-wall*2; h=inset*3;
+    translate([0,0,l_h/2]) {
+      translate([0,-l_d/2+wall,0]) latch(h, w, inset);
+      translate([0,l_d/2-wall,0]) rotate([0,0,180]) latch(h, w, inset);
+      translate([w/2,0,0]) rotate([0,0,90]) latch(h, l_d, inset);
+      translate([-w/2,0,0]) rotate([0,0,270]) latch(h, l_d, inset);
+    }
+  }
+  module connection_studs(gap=0) {
+    d=1.4+gap;   h=2.5;  inset=wall/2+h/2;
+    x=(dw*duploRaster-gapBetweenBricks)/2-inset;
+    y=l_d/2-inset;
+    translate([0,0,l_h/2+h/2]) {
+      translate([x,y,0])   cylinder(d=d, h=h, center=true);
+      translate([-x,y,0])  cylinder(d=d, h=h, center=true);
+      translate([x,-y,0])  cylinder(d=d, h=h, center=true);
+      translate([-x,-y,0]) cylinder(d=d, h=h, center=true);
+    }
+  }
+  module latches(positive=true) {
+    w=2;
+    d_l=0.5; d_t=1;
+    h_l=2; h_m=0.2; h_t=0.5;
+    module protrusion() {
+      cube([w,d_l,h_l]);
+      translate([w/2,d_l,h_l+h_m]) rotate([180,0,0]) latch(h_t,w,d_t);
+      translate([0,-d_t/2,h_l]) cube([w,d_t,h_m]);
+      translate([w/2,d_l,h_l]) rotate([180,180,0]) latch(h_t/2,w,d_t);
+    }
+    module hole() {
+      gap_a = 0.15; gap_b=1; gap_side=1; gap_top=0.01; gap_top2=0.5;
+      translate([-gap_side-w/2,-gap_a,0]) {
+        cube([w+gap_side*2,gap_a+gap_b+d_l,h_l-h_t/4-gap_top]);
+        translate([0,-d_t+d_l,h_l-h_t/4-gap_top]) cube([w+gap_side*2,gap_a+gap_b+d_t,h_m+h_t+gap_top2]);
+      }
+    }
+
+    inset = 1;
+    x=(dw*duploRaster-gapBetweenBricks-2*wall)/2-inset; // TODO used?
+    y=(l_d-2*wall)/2-inset;
+    translate([0,0,l_h/2]) {
+      if (positive) {
+        translate([-w/2,y,0]) protrusion();
+        translate([w/2,-y,0]) rotate([0,0,180]) protrusion();
+      } else {
+        translate([0,y,0]) hole();
+        translate([0,-y,0]) hole();
+      }
     }
   }
   module plug_cutout() {
@@ -118,26 +171,40 @@ module levitator() {
     }
   }
 
-
   union() {
-    *translate([0,duploRaster/2,0]) {
-      duplo(dw,3,0, true, false);
-      translate([0,0,-duploHeight/2]) 
-        cube([dw*duploRaster-gapBetweenBricks, 3*duploRaster-gapBetweenBricks, duploHeight], center=true);
-    }
-    translate([0, l_d/2+side_gap, -duploHeight-l_h/2]) {
+    if (top) {
       difference() {
         union() {
-          difference() {
-            basic_box();
-            plug_cutout();
+          translate([0,duploRaster/2,0]) {
+            duplo(dw,3,0, true, false);
+            translate([0,0,-duploHeight/2])
+              cube([dw*duploRaster-gapBetweenBricks, 3*duploRaster-gapBetweenBricks, duploHeight], center=true);
           }
-          plug_holder_with_platform();
-          solenoid_holder();
-          sensor_holder();
         }
-        solenoid_screw();
-        sensor_cutout();
+        #translate([0, l_d/2+side_gap, -duploHeight-l_h/2-delta]) {
+          connection_studs(0.1);
+          latches(positive=false);
+        }
+      }
+    }
+    if (bottom) {
+      translate([0, l_d/2+side_gap, -duploHeight-l_h/2]) {
+        difference() {
+          union() {
+            difference() {
+              basic_box();
+              plug_cutout();
+            }
+            tapering();
+            connection_studs();
+            latches(positive=true);
+            plug_holder_with_platform();
+            solenoid_holder();
+            sensor_holder();
+          }
+          solenoid_screw();
+          sensor_cutout();
+        }
       }
     }
   }
