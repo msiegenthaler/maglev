@@ -53,8 +53,8 @@ module levitator() {
   plug_offset_z = -6;
   bottom_box_h = l_h/2-plug_holder_z_size/2+plug_offset_z-wall;
   gap = 0.05;
-  solenoid_x=-duploRaster/2+2;
-  solenoid_l=15.5; solenoid_holder_t=4; solenoid_gap=gap+0.4;
+  solenoid_x=-duploRaster/2+2; solenoid_y=2.8-wall;
+  solenoid_l=15.5; solenoid_holder_t=3; solenoid_gap=gap+0.4;
 
   module basic_box() {
     difference() {
@@ -78,20 +78,20 @@ module levitator() {
   }
   module solenoid_holder() {
     holder_h=l_h_delta-5; holder_w=10; holder_d=solenoid_holder_t;
-    translate([solenoid_x, -l_d/2+holder_d/2+wall+solenoid_l+solenoid_gap, -l_h/2+wall+holder_h/2-holder_w/4]) {
+    translate([solenoid_x, -l_d/2+holder_d/2+wall+solenoid_l+solenoid_gap+solenoid_y, -l_h/2+wall+holder_h/2-holder_w/4]) {
       cube([holder_w,holder_d,holder_h-holder_w/2], center=true);
       translate([0,0,holder_w/2])
         rotate([90,0,0]) cylinder(d=holder_w, h=holder_d, center=true);
     }
   }
   module solenoid_screw() {
-    nut_t=3.5; nut_d=8;
-    screw_d = 3.9; l=solenoid_l+solenoid_gap+2*delta+solenoid_holder_t+gap;
+    nut_t=solenoid_holder_t-wall_inner; nut_d=8;
+    screw_d = 3.9; l=solenoid_l+solenoid_gap+2*delta+solenoid_holder_t+gap+solenoid_y+wall;
     screw_head_d = 7.9;
     translate([solenoid_x, -l_d/2, l_h/2-air_gap-z_magnet_offset]) {
       translate([0,l/2-delta,0])
         rotate([90,0,0]) cylinder(d=screw_d+gap, h=l, center=true);
-      #translate([0,-nut_t/2-delta+l+wall,0])
+      translate([0,-nut_t/2-delta+l+wall,0])
         rotate([90,0,0]) cylinder(d=nut_d+gap, h=nut_t, center=true, $fn=6);
       translate([0,l/2-delta,0])
         rotate([90,0,0]) cylinder(d=screw_d+gap, h=l, center=true);
@@ -143,7 +143,7 @@ module levitator() {
   }
   // Placeholders for separatly printed stuff
   %translate([solenoid_x,side_gap,-duploHeight]) {
-    translate([0,0,-air_gap-z_magnet_offset]) {
+    translate([0,solenoid_y,-air_gap-z_magnet_offset]) {
         translate([0,solenoid_l/2+wall+4,0]) rotate([0,0,90]) soleniod(len=solenoid_l, outside_d=16, hole=4, left=true);
         translate([0,4+wall,0]) rotate([0,0,-90]) soleniod(len=solenoid_l, outside_d=16, hole=4, left=false);
     }
