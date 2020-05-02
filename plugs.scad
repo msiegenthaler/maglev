@@ -5,7 +5,7 @@ plug_ratch_z = 2.7;
 plug_ratch_h = 3.3;
 plug_ratch_d = 6.7;
 plug_wall = 1.3;
-plug_holder_wall = 0.5;
+plug_holder_wall = 0.8;
 plug_holder_gap = 0.15;
 
 delta = $preview ? 0.005 : 0; //for better preview rendering
