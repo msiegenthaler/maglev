@@ -33,11 +33,11 @@ side_gap = 5;    //expected gap between solenoid and rail
 //magnet();
 //test_stripe();
 
-// levitator();
-// *translate([0,-duploRaster/2,-duploHeight-air_gap]) rotate([0,0,90]) {
-//   duplo_bottom(4,4);
-// }
-levitator_solenoid();
+levitator();
+*translate([0,-duploRaster/2,-duploHeight-air_gap]) rotate([0,0,90]) {
+  duplo_bottom(4,4);
+}
+// levitator_solenoid();
 
 // plug_holder();
 
