@@ -138,7 +138,7 @@ module levitator(top=true, bottom=true) {
     }
   }
   module solenoid_screw() {
-    nut_t=solenoid_holder_t-wall_inner; nut_d=8;
+    nut_t=solenoid_holder_t-wall_inner; nut_d=8.5;
     screw_d = 3.9; l=solenoid_l+solenoid_gap+2*delta+solenoid_holder_t+gap+solenoid_y+wall;
     screw_head_d = 7.9;
     translate([solenoid_x, -l_d/2, l_h/2-air_gap-z_magnet_offset]) {
