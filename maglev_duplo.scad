@@ -44,17 +44,16 @@ levitator();
 module levitator() {
   z_magnet_offset = 9;
   sensor_w = 4.05;  sensor_h = 3.2;  sensor_d = 1.7;
-  sensor_solenoid_gap = 19;
+  sensor_solenoid_gap = 18.3;
   dw = 2;
-  wall = 1;
-  wall = 2;
+  wall = 1.5;
   wall_inner = 0.6;
   l_h_delta = 19;
   l_h = air_gap+l_h_delta; l_d=duploRaster*2-side_gap-gapBetweenBricks/2;
   plug_offset_z = -6;
   bottom_box_h = l_h/2-plug_holder_z_size/2+plug_offset_z-wall;
   gap = 0.05;
-  solenoid_x=-duploRaster/2;
+  solenoid_x=-duploRaster/2+2;
   solenoid_l=15.5; solenoid_holder_t=4; solenoid_gap=gap+0.4;
 
   module basic_box() {
@@ -88,13 +87,16 @@ module levitator() {
   module solenoid_screw() {
     nut_t=3.5; nut_d=8;
     screw_d = 3.9; l=solenoid_l+solenoid_gap+2*delta+solenoid_holder_t+gap;
+    screw_head_d = 7.9;
     translate([solenoid_x, -l_d/2, l_h/2-air_gap-z_magnet_offset]) {
       translate([0,l/2-delta,0])
         rotate([90,0,0]) cylinder(d=screw_d+gap, h=l, center=true);
-      translate([0,-nut_t/2-delta+l,0])
+      #translate([0,-nut_t/2-delta+l+wall,0])
         rotate([90,0,0]) cylinder(d=nut_d+gap, h=nut_t, center=true, $fn=6);
       translate([0,l/2-delta,0])
         rotate([90,0,0]) cylinder(d=screw_d+gap, h=l, center=true);
+      translate([0,wall/2-delta,0])
+        rotate([90,0,0]) cylinder(d=screw_head_d+2*gap, h=wall+3*delta, center=true);
     }
   }
   module sensor_holder() {
@@ -140,7 +142,7 @@ module levitator() {
     }
   }
   // Placeholders for separatly printed stuff
-  %translate([-duploRaster/2+1,side_gap,-duploHeight]) {
+  %translate([solenoid_x,side_gap,-duploHeight]) {
     translate([0,0,-air_gap-z_magnet_offset]) {
         translate([0,solenoid_l/2+wall+4,0]) rotate([0,0,90]) soleniod(len=solenoid_l, outside_d=16, hole=4, left=true);
         translate([0,4+wall,0]) rotate([0,0,-90]) soleniod(len=solenoid_l, outside_d=16, hole=4, left=false);
