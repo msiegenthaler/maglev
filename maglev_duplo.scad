@@ -290,7 +290,7 @@ module duplo_railholder_a(len, magnet_count, arm_count) {
 }
 
 module soleniod(len=1, outside_d, hole, left=false) {
-  wall = 1.2; side_wall=0.8; gap = 0.08;
+  wall = 1.2; side_wall=0.8; gap = 0.11;
   inside_d=hole+wall*2+gap*2;
   w = len;
   holder_w = 2;
