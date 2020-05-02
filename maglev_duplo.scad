@@ -33,12 +33,12 @@ side_gap = 5;    //expected gap between solenoid and rail
 //magnet();
 //test_stripe();
 
-levitator(top=false, bottom=true);
+*levitator(top=false, bottom=true);
 *levitator(top=true, bottom=false);
 *translate([0,-duploRaster/2,-duploHeight-air_gap]) rotate([0,0,90]) {
   duplo_bottom(4,4);
 }
-// levitator_solenoid();
+levitator_solenoid();
 
 // plug_holder();
 
@@ -75,7 +75,7 @@ module levitator(top=true, bottom=true) {
     }
   }
   module connection_studs(gap=0) {
-    d=1.4+gap;   h=2.5;  inset=wall/2+h/2;
+    d=1.4+gap;   h=2.5+gap;  inset=wall/2+h/2;
     x=(dw*duploRaster-gapBetweenBricks)/2-inset;
     y=l_d/2-inset;
     translate([0,0,l_h/2+h/2]) {
@@ -87,16 +87,16 @@ module levitator(top=true, bottom=true) {
   }
   module latches(positive=true) {
     w=2;
-    d_l=0.5; d_t=1;
+    d_l=0.8; d_t=1.1;
     h_l=2; h_m=0.2; h_t=0.5;
     module protrusion() {
       cube([w,d_l,h_l]);
       translate([w/2,d_l,h_l+h_m]) rotate([180,0,0]) latch(h_t,w,d_t);
-      translate([0,-d_t/2,h_l]) cube([w,d_t,h_m]);
+      translate([0,-(d_t-d_l),h_l]) cube([w,d_t,h_m]);
       translate([w/2,d_l,h_l]) rotate([180,180,0]) latch(h_t/2,w,d_t);
     }
     module hole() {
-      gap_a = 0.15; gap_b=1; gap_side=1; gap_top=0.01; gap_top2=0.5;
+      gap_a = 0.05; gap_b=1; gap_side=0.5; gap_top=0.01; gap_top2=0.5;
       translate([-gap_side-w/2,-gap_a,0]) {
         cube([w+gap_side*2,gap_a+gap_b+d_l,h_l-h_t/4-gap_top]);
         translate([0,-d_t+d_l,h_l-h_t/4-gap_top]) cube([w+gap_side*2,gap_a+gap_b+d_t,h_m+h_t+gap_top2]);
@@ -112,7 +112,7 @@ module levitator(top=true, bottom=true) {
         translate([w/2,-y,0]) rotate([0,0,180]) protrusion();
       } else {
         translate([0,y,0]) hole();
-        translate([0,-y,0]) hole();
+        translate([0,-y,0]) rotate([0,0,180]) hole();
       }
     }
   }
@@ -149,7 +149,7 @@ module levitator(top=true, bottom=true) {
       translate([0,l/2-delta,0])
         rotate([90,0,0]) cylinder(d=screw_d+gap, h=l, center=true);
       translate([0,wall/2-delta,0])
-        rotate([90,0,0]) cylinder(d=screw_head_d+2*gap, h=wall+3*delta, center=true);
+        rotate([90,0,0]) cylinder(d=screw_head_d+2*gap, h=wall+gap, center=true);
     }
   }
   module sensor_holder() {
@@ -182,7 +182,7 @@ module levitator(top=true, bottom=true) {
           }
         }
         #translate([0, l_d/2+side_gap, -duploHeight-l_h/2-delta]) {
-          connection_studs(0.1);
+          connection_studs(0.15);
           latches(positive=false);
         }
       }
