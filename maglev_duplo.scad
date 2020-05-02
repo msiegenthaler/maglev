@@ -46,13 +46,15 @@ module levitator() {
   sensor_w = 4.05;  sensor_h = 3.2;  sensor_d = 1.7;
   sensor_solenoid_gap = 19;
   dw = 2;
-  wall = 0.5;
+  wall = 1;
+  wall = 2;
+  wall_inner = 0.6;
   l_h_delta = 19;
   l_h = air_gap+l_h_delta; l_d=duploRaster*2-side_gap-gapBetweenBricks/2;
   plug_offset_z = -6;
   bottom_box_h = l_h/2-plug_holder_z_size/2+plug_offset_z-wall;
   gap = 0.05;
-  solenoid_x=-duploRaster/2+1;
+  solenoid_x=-duploRaster/2;
   solenoid_l=15.5; solenoid_holder_t=4; solenoid_gap=gap+0.4;
 
   module basic_box() {
@@ -77,7 +79,7 @@ module levitator() {
   }
   module solenoid_holder() {
     holder_h=l_h_delta-5; holder_w=10; holder_d=solenoid_holder_t;
-    translate([solenoid_x,-l_d/2+holder_d/2+solenoid_l+solenoid_gap,-l_h/2+wall+holder_h/2-holder_w/4]) {
+    translate([solenoid_x, -l_d/2+holder_d/2+wall+solenoid_l+solenoid_gap, -l_h/2+wall+holder_h/2-holder_w/4]) {
       cube([holder_w,holder_d,holder_h-holder_w/2], center=true);
       translate([0,0,holder_w/2])
         rotate([90,0,0]) cylinder(d=holder_w, h=holder_d, center=true);
@@ -96,8 +98,8 @@ module levitator() {
     }
   }
   module sensor_holder() {
-    w=sensor_w+2*gap+2*wall;
-    d=sensor_d+gap+wall;
+    w=sensor_w+2*gap+2*wall_inner;
+    d=sensor_d+gap+wall_inner-0.1;
     h=l_h-air_gap-z_magnet_offset+sensor_h/2+0.5;
     translate([solenoid_x+sensor_solenoid_gap,-l_d/2+d/2+wall,-l_h/2+h/2+wall])
       cube([w,d,h], center=true);
@@ -136,10 +138,10 @@ module levitator() {
     }
   }
   // Placeholders for separatly printed stuff
-  *translate([-duploRaster/2+1,side_gap,-duploHeight]) {
+  %translate([-duploRaster/2+1,side_gap,-duploHeight]) {
     translate([0,0,-air_gap-z_magnet_offset]) {
-        translate([0,solenoid_l/2+4.3,0]) rotate([0,0,90]) soleniod(len=solenoid_l, outside_d=16, hole=4, left=true);
-        translate([0,4.3,0]) rotate([0,0,-90]) soleniod(len=solenoid_l, outside_d=16, hole=4, left=false);
+        translate([0,solenoid_l/2+wall+4,0]) rotate([0,0,90]) soleniod(len=solenoid_l, outside_d=16, hole=4, left=true);
+        translate([0,4+wall,0]) rotate([0,0,-90]) soleniod(len=solenoid_l, outside_d=16, hole=4, left=false);
     }
     translate([sensor_solenoid_gap,sensor_d/2+wall,-air_gap-z_magnet_offset]) {
       cube([sensor_w, sensor_d, sensor_h], center=true);
