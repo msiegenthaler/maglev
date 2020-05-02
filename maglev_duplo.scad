@@ -105,12 +105,14 @@ module levitator() {
       cube([w,d,h], center=true);
   }
   module sensor_cutout() {
-    top_space=2;
+    top_space=wall+1;
+    sensor_gap = 0.075;
     translate([solenoid_x+sensor_solenoid_gap, -l_d/2, l_h/2-air_gap-z_magnet_offset]) {
-      translate([0,wall+sensor_d/2+gap,top_space/2]) {
-        cube([sensor_w+2*gap, sensor_d+2*gap, sensor_h+2*gap+top_space], center=true);
+      translate([0,wall+sensor_d/2+sensor_gap,top_space/2]) {
+        cube([sensor_w+2*sensor_gap, sensor_d+2*sensor_gap, sensor_h+2*sensor_gap+top_space], center=true);
       }
-      translate([0,wall/2-delta,0]) rotate([90,0,0]) cylinder(d=0.2, h=wall+3*delta, center=true);
+      // marker, don't print in real model
+      %translate([0,wall/2-delta,0]) rotate([90,0,0]) cylinder(d=0.2, h=wall+3*delta, center=true);
     }
   }
 
