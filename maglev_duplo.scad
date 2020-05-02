@@ -33,30 +33,32 @@ side_gap = 5;    //expected gap between solenoid and rail
 //magnet();
 //test_stripe();
 
-levitator();
-*translate([0,-duploRaster/2,-duploHeight-air_gap]) rotate([0,0,90]) {
-  duplo_bottom(4,4);
-}
+// levitator();
+// *translate([0,-duploRaster/2,-duploHeight-air_gap]) rotate([0,0,90]) {
+//   duplo_bottom(4,4);
+// }
+levitator_solenoid();
 
 // plug_holder();
 
 module levitator() {
   z_magnet_offset = 9;
-  sensor_w = 4.05;  sensor_h = 3.2;  sensor_d = 1.6;
+  sensor_w = 4.05;  sensor_h = 3.2;  sensor_d = 1.7;
   sensor_solenoid_gap = 19;
   dw = 2;
   wall = 0.5;
   l_h_delta = 19;
   l_h = air_gap+l_h_delta; l_d=duploRaster*2-side_gap-gapBetweenBricks/2;
   plug_offset_z = -6;
-  bottom_box_h = l_h/2-plug_holder_z_size/2+plug_offset_z;
+  bottom_box_h = l_h/2-plug_holder_z_size/2+plug_offset_z-wall;
   gap = 0.05;
+  solenoid_x=-duploRaster/2+1;
   solenoid_l=15.5; solenoid_holder_t=4; solenoid_gap=gap+0.4;
 
   module basic_box() {
     difference() {
       cube([dw*duploRaster-gapBetweenBricks, l_d, l_h], center=true);      
-      translate([-2,0,delta+wall]) // TODO replace -2 with 0
+      translate([0,0,delta+wall])
         cube([dw*duploRaster-gapBetweenBricks-2*wall, l_d-2*wall, l_h-wall], center=true);
     }
   }
@@ -72,16 +74,10 @@ module levitator() {
       translate([-plug_holder_y_size/2,0,-plug_holder_z_size/2-bottom_box_h/2])
         cube([plug_holder_y_size,plug_holder_x_size,bottom_box_h], center=true);
     }
-    translate([px/2,0,plug_offset_z]) {
-      translate([plug_holder_y_offset-plug_holder_y_size,0,0]) rotate([90,0,90])
-        plug_holder();
-      translate([-plug_holder_y_size/2,0,-plug_holder_z_size/2-bottom_box_h/2])
-        cube([plug_holder_y_size,plug_holder_x_size,bottom_box_h], center=true);
-    }
   }
   module solenoid_holder() {
     holder_h=l_h_delta-5; holder_w=10; holder_d=solenoid_holder_t;
-    translate([-duploRaster/2+1,-l_d/2+holder_d/2+solenoid_l+solenoid_gap,-l_h/2+wall+holder_h/2-holder_w/4]) {
+    translate([solenoid_x,-l_d/2+holder_d/2+solenoid_l+solenoid_gap,-l_h/2+wall+holder_h/2-holder_w/4]) {
       cube([holder_w,holder_d,holder_h-holder_w/2], center=true);
       translate([0,0,holder_w/2])
         rotate([90,0,0]) cylinder(d=holder_w, h=holder_d, center=true);
@@ -90,14 +86,29 @@ module levitator() {
   module solenoid_screw() {
     nut_t=3.5; nut_d=8;
     screw_d = 3.9; l=solenoid_l+solenoid_gap+2*delta+solenoid_holder_t+gap;
-    echo(l);
-    translate([-duploRaster/2+1, -l_d/2, 0]) {
-      translate([0,l/2-delta,l_h/2-air_gap-z_magnet_offset])
+    translate([solenoid_x, -l_d/2, l_h/2-air_gap-z_magnet_offset]) {
+      translate([0,l/2-delta,0])
         rotate([90,0,0]) cylinder(d=screw_d+gap, h=l, center=true);
-      translate([0,-nut_t/2-delta+l,l_h/2-air_gap-z_magnet_offset])
+      translate([0,-nut_t/2-delta+l,0])
         rotate([90,0,0]) cylinder(d=nut_d+gap, h=nut_t, center=true, $fn=6);
-      translate([0,l/2-delta,l_h/2-air_gap-z_magnet_offset])
+      translate([0,l/2-delta,0])
         rotate([90,0,0]) cylinder(d=screw_d+gap, h=l, center=true);
+    }
+  }
+  module sensor_holder() {
+    w=sensor_w+2*gap+2*wall;
+    d=sensor_d+gap+wall;
+    h=l_h-air_gap-z_magnet_offset+sensor_h/2+0.5;
+    translate([solenoid_x+sensor_solenoid_gap,-l_d/2+d/2+wall,-l_h/2+h/2+wall])
+      cube([w,d,h], center=true);
+  }
+  module sensor_cutout() {
+    top_space=2;
+    translate([solenoid_x+sensor_solenoid_gap, -l_d/2, l_h/2-air_gap-z_magnet_offset]) {
+      translate([0,wall+sensor_d/2+gap,top_space/2]) {
+        cube([sensor_w+2*gap, sensor_d+2*gap, sensor_h+2*gap+top_space], center=true);
+      }
+      translate([0,wall/2-delta,0]) rotate([90,0,0]) cylinder(d=0.2, h=wall+3*delta, center=true);
     }
   }
 
@@ -117,13 +128,15 @@ module levitator() {
           }
           plug_holder_with_platform();
           solenoid_holder();
+          sensor_holder();
         }
         solenoid_screw();
+        sensor_cutout();
       }
     }
   }
   // Placeholders for separatly printed stuff
-  %translate([-duploRaster/2+1,side_gap,-duploHeight]) {
+  *translate([-duploRaster/2+1,side_gap,-duploHeight]) {
     translate([0,0,-air_gap-z_magnet_offset]) {
         translate([0,solenoid_l/2+4.3,0]) rotate([0,0,90]) soleniod(len=solenoid_l, outside_d=16, hole=4, left=true);
         translate([0,4.3,0]) rotate([0,0,-90]) soleniod(len=solenoid_l, outside_d=16, hole=4, left=false);
@@ -132,6 +145,12 @@ module levitator() {
       cube([sensor_w, sensor_d, sensor_h], center=true);
     }
   }
+}
+
+module levitator_solenoid() {
+  solenoid_l=15.5;
+  translate([0,0,0]) rotate([0,90,0]) soleniod(len=solenoid_l, outside_d=16, hole=4, left=true);
+  translate([0,20,0]) rotate([0,90,0]) soleniod(len=solenoid_l, outside_d=16, hole=4, left=false);
 }
 
 // Duplo stick of size lenx1 that contains count magnets and attaches to the bottom
