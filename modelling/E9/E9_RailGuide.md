@@ -9,7 +9,7 @@ Given:
   - outer diameter 10mm, length 10mm
   - permeability of 500
   - 5000 turns, 300 mA
-- Target air gap between the rail and the end of the solenoid of 5mm
+- target air gap between the rail and the end of the solenoid of 5mm
 
 Targets:
 - Maximal horizontal force (x-direction)
@@ -28,7 +28,7 @@ Result:
 - S facing top, solenoid center 3mm below rail-magnet center is optimal (pulls towards rail)
 - be careful if reversing the magnet, this is unstable. Probably better to try to only correct with S-top (on the side it is farter away)
 
-see [Google Sheets](https://docs.google.com/spreadsheets/d/1-nTOAxxbFqjPpGzVE3cWuoPyFOnyhRpN7xA-p9OE-tk/edit#gid=663803625) for detailed data.
+see [Google Sheets](https://docs.google.com/spreadsheets/d/1-nTOAxxbFqjPpGzVE3cWuoPyFOnyhRpN7xA-p9OE-tk/edit#gid=2105873856) for detailed data.
 
 ![Horizontal Force](images/2020-05-17-17-01-58.png)
 
