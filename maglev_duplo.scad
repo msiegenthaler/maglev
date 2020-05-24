@@ -1,5 +1,6 @@
 include <lib/duplo-block-lib.scad>
 include <plugs.scad>
+include <honeycomb.scad>
 
 $fs = 0.1;
 $fa = 1;
@@ -44,6 +45,7 @@ levitator(top=false, bottom=true);
 
 // plug_holder();
 
+
 module levitator(top=true, bottom=true) {
   sensor_w = 4.05;  sensor_h = 3.2;  sensor_d = 1.7; sensor_z = 9;
   sensor_solenoid_gap = 16.7;
@@ -60,10 +62,15 @@ module levitator(top=true, bottom=true) {
   solenoid_holder_t=3; solenoid_gap=gap+0.4;
 
   module basic_box() {
+    comb_d = 4; comb_gap = .7; no_comb_l=wall*2; no_comb_h=7;
     difference() {
       cube([dw*duploRaster-gapBetweenBricks, l_d, l_h], center=true);      
       translate([0,0,delta+wall])
         cube([dw*duploRaster-gapBetweenBricks-2*wall, l_d-2*wall, l_h-wall], center=true);
+      translate([-dw*duploRaster/2+gapBetweenBricks/2-delta,-l_d/2+wall,l_h/2])
+        rotate([0,90,0]) honey_comb(l_h, l_d-no_comb_l, wall+2*delta, comb_d=comb_d, comb_gap=comb_gap);
+      translate([-dw*duploRaster/2+gapBetweenBricks/2-delta+wall,-l_d/2+wall+delta,l_h/2])
+        rotate([90,90,0]) honey_comb(l_h, l_d-no_comb_h, wall+2*delta, comb_d=comb_d, comb_gap=comb_gap);
     }
   }
   module tapering() {
@@ -212,9 +219,8 @@ module levitator(top=true, bottom=true) {
 }
 
 module levitator_solenoid() {
-  solenoid_l=15.5;
-  translate([0,0,0]) rotate([0,90,0]) soleniod(len=solenoid_l, outside_d=16, hole=4, left=true);
-  translate([0,20,0]) rotate([0,90,0]) soleniod(len=solenoid_l, outside_d=16, hole=4, left=false);
+  translate([0,0,0]) rotate([0,90,0]) soleniod(len=rail_solenoid_l, outside_d=rail_solenoid_d, hole=4, left=true);
+  translate([0,25,0]) rotate([0,90,0]) soleniod(len=rail_solenoid_l, outside_d=rail_solenoid_d, hole=4, left=false);
 }
 
 // Duplo stick of size lenx1 that contains count magnets and attaches to the bottom
