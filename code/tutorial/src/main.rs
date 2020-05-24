@@ -1,14 +1,14 @@
+use linux_embedded_hal::I2cdev;
+use std::thread;
 use std::time::{Duration, SystemTime};
 use tutorial::aggregator::MedianOverWindow;
 use tutorial::devices::distance_sensor::DistanceSensor;
+use tutorial::devices::hall_sensor::{FluxDensity, HallSensor};
+use tutorial::devices::zero_borg::{AnalogSource, Led, Motor, MotorPower, ZeroBorg};
+use tutorial::devices::Voltage;
 use tutorial::distance::Distance;
 use tutorial::measurer::Measurer;
 use tutorial::visualize_status::VisualizeStatus;
-use tutorial::devices::zero_borg::{ZeroBorg, Led, AnalogSource, Motor, MotorPower};
-use linux_embedded_hal::I2cdev;
-use std::thread;
-use tutorial::devices::hall_sensor::{HallSensor, FluxDensity};
-use tutorial::devices::Voltage;
 
 fn main() {
     println!("Starting...");
@@ -30,31 +30,38 @@ fn main() {
     borg.set_led_value(Led::IRLed, true).unwrap();
     borg.reset_emergency_power_off().unwrap();
     borg.set_motor(Motor::Motor1, MotorPower::off()).unwrap();
+    borg.set_motor(Motor::Motor2, MotorPower::off()).unwrap();
     // borg.set_motor(Motor::Motor1, MotorPower::full_forward()).unwrap();
 
     let mut i = 0_u32;
     let interval = 5;
 
-
     loop {
         // if (i / interval) % 2 == 0 {
-        //     borg.set_motor(Motor::Motor1, MotorPower::full_forward()).unwrap();
+        //     borg.set_motor(Motor::Motor1, MotorPower::full_forward())
+        //         .unwrap();
         // }
         // else if (i / interval) % 2 == 2 {
         //     borg.set_motor(Motor::Motor1, MotorPower::off()).unwrap();
         // } else {
-        //     borg.set_motor(Motor::Motor1, MotorPower::full_backward()).unwrap();
+        // borg.set_motor(Motor::Motor1, MotorPower::full_backward())
+        //     .unwrap();
         // }
         i += 1;
 
+        // borg.set_motor(Motor::Motor1, MotorPower::full_backward())
+        //     .unwrap();
+
         let analog1 = borg.get_analog(AnalogSource::Analog1).unwrap().voltage();
 
-        println!("values m={:>4.0} Gs    m1={:>5?} led={:>5} ir_led={:>5} epo={:>5}",
-                 magnetic.value_as_flux_density(analog1).in_gauss(),
-                 borg.get_motor(Motor::Motor1).unwrap(),
-                 borg.get_led_value(Led::MainLed).unwrap(),
-                 borg.get_led_value(Led::IRLed).unwrap(),
-                 borg.get_emergency_power_off_state().unwrap(),
+        println!(
+            "values m={:>4.0} Gs    m1={:>5?} m2={:>5?} led={:>5} ir_led={:>5} epo={:>5}",
+            magnetic.value_as_flux_density(analog1).in_gauss(),
+            borg.get_motor(Motor::Motor1).unwrap(),
+            borg.get_motor(Motor::Motor2).unwrap(),
+            borg.get_led_value(Led::MainLed).unwrap(),
+            borg.get_led_value(Led::IRLed).unwrap(),
+            borg.get_emergency_power_off_state().unwrap(),
         );
 
         thread::sleep(Duration::from_millis(100));
