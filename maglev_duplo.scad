@@ -22,7 +22,7 @@ rail_solenoid_d = 19.5;
 // duplo_bottom(4, 4);
 // duplo_top_straight(4, 3);
 // duplo_top_cross(2, 4);
-// duplo_top_cross(4, 8);
+// duplo_top_cross(2, 2);
 // duplo_vert_vert(2, 4);
 // duplo_railholder_a(4, 4, 2);
 // translate([0,0,30])
@@ -36,8 +36,8 @@ rail_solenoid_d = 19.5;
 //magnet();
 //test_stripe();
 
-levitator(top=false, bottom=true);
-*levitator(top=true, bottom=false);
+*levitator(top=false, bottom=true);
+levitator(top=true, bottom=false);
 %translate([0,-duploRaster/2,-duploHeight-air_gap]) rotate([0,0,90]) {
   duplo_bottom(4,4);
 }
@@ -60,6 +60,7 @@ module levitator(top=true, bottom=true) {
   solenoid_x=-duploRaster+rail_solenoid_d/2+wall+0.2; solenoid_y=-0.1;
   solenoid_z=-air_gap-2; //aligned to middle of rail magnet
   solenoid_holder_t=3; solenoid_gap=gap+0.4;
+  levitator_magnet_count = 2;
 
   module basic_box() {
     comb_d = 4; comb_gap = .7; no_comb_l=wall*2; no_comb_h=7;
@@ -174,12 +175,17 @@ module levitator(top=true, bottom=true) {
       difference() {
         union() {
           translate([0,duploRaster/2,0]) {
-            duplo(dw,3,0, true, false);
+            translate([0,0,-1]) duplo(dw,3,0, true, false);
             translate([0,0,-duploHeight/2])
               cube([dw*duploRaster-gapBetweenBricks, 3*duploRaster-gapBetweenBricks, duploHeight], center=true);
           }
         }
-        #translate([0, l_d/2+side_gap, -duploHeight-l_h/2-delta]) {
+        translate([0,-duploRaster/2+0.2,-duploHeight-delta]) {
+          for (i=[0:levitator_magnet_count-1]) {
+            translate([(duploRaster*dw-gapBetweenBricks)/levitator_magnet_count*((levitator_magnet_count-1)/2-i), 0, 0]) rotate([180,0,0]) magnet_pit();
+          }
+        }
+        translate([0, l_d/2+side_gap, -duploHeight-l_h/2-delta]) {
           connection_studs(0.15);
           latches(positive=false);
         }
