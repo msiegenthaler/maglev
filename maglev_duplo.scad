@@ -180,7 +180,7 @@ module levitator(top=true, bottom=true) {
               cube([dw*duploRaster-gapBetweenBricks, 3*duploRaster-gapBetweenBricks, duploHeight], center=true);
           }
         }
-        translate([0,-duploRaster/2+0.2,-duploHeight-delta]) {
+        translate([0,-duploRaster/2+0.2+0.5,-duploHeight-delta]) {
           for (i=[0:levitator_magnet_count-1]) {
             translate([(duploRaster*dw-gapBetweenBricks)/levitator_magnet_count*((levitator_magnet_count-1)/2-i), 0, 0]) rotate([180,0,0]) magnet_pit();
           }
