@@ -85,7 +85,7 @@ module levitator(top=true, bottom=true) {
     }
   }
   module connection_studs(gap=0) {
-    d=1.4+gap;   h=2.5+gap;  inset=wall/2+h/2;
+    d=2.5+gap;   h=2.5+gap;  inset=wall/2+h/2;
     x=(dw*duploRaster-gapBetweenBricks)/2-inset;
     y=l_d/2-inset;
     translate([0,0,l_h/2+h/2]) {
@@ -96,9 +96,9 @@ module levitator(top=true, bottom=true) {
     }
   }
   module latches(positive=true) {
-    w=2;
-    d_l=0.8; d_t=1.1;
-    h_l=2; h_m=0.2; h_t=0.5;
+    w=6;
+    d_l=1.8; d_t=2.4;
+    h_l=3; h_m=0.7; h_t=0.8;
     module protrusion() {
       cube([w,d_l,h_l]);
       translate([w/2,d_l,h_l+h_m]) rotate([180,0,0]) latch(h_t,w,d_t);
@@ -106,14 +106,14 @@ module levitator(top=true, bottom=true) {
       translate([w/2,d_l,h_l]) rotate([180,180,0]) latch(h_t/2,w,d_t);
     }
     module hole() {
-      gap_a = 0.05; gap_b=1; gap_side=0.5; gap_top=0.01; gap_top2=0.5;
+      gap_a = 0.05; gap_b=0.6; gap_side=0.5; gap_top=0.5; gap_top2=0.8;
       translate([-gap_side-w/2,-gap_a,0]) {
         cube([w+gap_side*2,gap_a+gap_b+d_l,h_l-h_t/4-gap_top]);
         translate([0,-d_t+d_l,h_l-h_t/4-gap_top]) cube([w+gap_side*2,gap_a+gap_b+d_t,h_m+h_t+gap_top2]);
       }
     }
 
-    inset = 1;
+    inset = 1.6;
     x=(dw*duploRaster-gapBetweenBricks-2*wall)/2-inset; // TODO used?
     y=(l_d-2*wall)/2-inset;
     translate([0,0,l_h/2]) {
@@ -186,7 +186,7 @@ module levitator(top=true, bottom=true) {
           }
         }
         translate([0, l_d/2+side_gap, -duploHeight-l_h/2-delta]) {
-          connection_studs(0.15);
+          connection_studs(0.3);
           latches(positive=false);
         }
       }
