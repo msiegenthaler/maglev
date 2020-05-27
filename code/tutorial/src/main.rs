@@ -24,7 +24,7 @@ fn main() {
     let borg0_address = *zero_borgs.get(0).unwrap();
     let mut borg = ZeroBorg::new(i2c, borg0_address);
 
-    let mut magnetic = HallSensor::new(FluxDensity::from_gauss(670.), Voltage::from_volts(3.3));
+    let magnetic = HallSensor::new(FluxDensity::from_gauss(670.), Voltage::from_volts(3.3));
 
     borg.set_led_value(Led::MainLed, true).unwrap();
     borg.set_led_value(Led::IRLed, true).unwrap();
@@ -32,42 +32,67 @@ fn main() {
     borg.set_motor(Motor::Motor1, MotorPower::off()).unwrap();
     borg.set_motor(Motor::Motor2, MotorPower::off()).unwrap();
     // borg.set_motor(Motor::Motor1, MotorPower::full_forward()).unwrap();
+    borg.set_motor(Motor::Motor2, MotorPower::full_forward()).unwrap();
+    // borg.set_motor(Motor::Motor2, MotorPower::full_forward()).unwrap();
 
-    let mut i = 0_u32;
-    let interval = 5;
 
+    balance(borg, magnetic);
+
+    // let mut i = 0_u32;
+    // let interval = 5;
+    // loop {
+    //     if (i / interval) % 2 == 0 {
+    //         borg.set_motor(Motor::Motor2, MotorPower::full_forward()).unwrap();
+    //     } else if (i / interval) % 2 == 2 {
+    //         borg.set_motor(Motor::Motor2, MotorPower::off()).unwrap();
+    //     } else {
+    //         borg.set_motor(Motor::Motor2, MotorPower::full_backward()).unwrap();
+    //     }
+    //     i += 1;
+    //
+    //     let analog1 = borg.get_analog(AnalogSource::Analog1).unwrap().voltage();
+    //
+    //     println!("values m={:>4.0} Gs    m2={:>5?} led={:>5} ir_led={:>5} epo={:>5}",
+    //              magnetic.value_as_flux_density(analog1).in_gauss(),
+    //              borg.get_motor(Motor::Motor2).unwrap(),
+    //              borg.get_led_value(Led::MainLed).unwrap(),
+    //              borg.get_led_value(Led::IRLed).unwrap(),
+    //              borg.get_emergency_power_off_state().unwrap(),
+    //     );
+    //
+    //     thread::sleep(Duration::from_millis(100));
+    //
+    //     // let led_value = borg.get_led_value(Led::MainLed).unwrap();
+    //     // borg.set_led_value(Led::MainLed, !led_value).unwrap();
+    // }
+}
+
+fn balance(mut borg: ZeroBorg<I2cdev>, hall_sensor: HallSensor) {
+    let target_flux = FluxDensity::from_gauss(45.);
+    let flux_range = FluxDensity::from_gauss(5.);
+    let motor_per_gauss = 3.;
+
+    borg.set_motor(Motor::Motor2, MotorPower::off()).unwrap();
     loop {
-        // if (i / interval) % 2 == 0 {
-        //     borg.set_motor(Motor::Motor1, MotorPower::full_forward())
-        //         .unwrap();
-        // }
-        // else if (i / interval) % 2 == 2 {
-        //     borg.set_motor(Motor::Motor1, MotorPower::off()).unwrap();
-        // } else {
-        // borg.set_motor(Motor::Motor1, MotorPower::full_backward())
-        //     .unwrap();
-        // }
-        i += 1;
+        let flux_density = hall_sensor.value_as_flux_density(borg.get_analog(AnalogSource::Analog1).unwrap().voltage());
+        let correction = ((flux_density - target_flux).in_gauss() * motor_per_gauss).abs().min(255.) as u8;
 
-        // borg.set_motor(Motor::Motor1, MotorPower::full_backward())
-        //     .unwrap();
+        // borg.set_motor(Motor::Motor2, MotorPower::full_forward()).unwrap();
 
-        let analog1 = borg.get_analog(AnalogSource::Analog1).unwrap().voltage();
+        if flux_density > target_flux + flux_range {
+            println!("Current value is {:>4.0} Gs => Correcting (backward by {})", flux_density.in_gauss(), correction);
+            borg.set_motor(Motor::Motor2, MotorPower::backward(correction)).unwrap();
+        } else if flux_density < target_flux - flux_range {
+            println!("Current value is {:>4.0} Gs => Correcting (forward by {})", flux_density.in_gauss(), correction);
+            borg.set_motor(Motor::Motor2, MotorPower::forward(correction)).unwrap();
+        } else {
+            borg.set_motor(Motor::Motor2, MotorPower::off()).unwrap();
+        }
 
-        println!(
-            "values m={:>4.0} Gs    m1={:>5?} m2={:>5?} led={:>5} ir_led={:>5} epo={:>5}",
-            magnetic.value_as_flux_density(analog1).in_gauss(),
-            borg.get_motor(Motor::Motor1).unwrap(),
-            borg.get_motor(Motor::Motor2).unwrap(),
-            borg.get_led_value(Led::MainLed).unwrap(),
-            borg.get_led_value(Led::IRLed).unwrap(),
-            borg.get_emergency_power_off_state().unwrap(),
-        );
-
-        thread::sleep(Duration::from_millis(100));
-
-        // let led_value = borg.get_led_value(Led::MainLed).unwrap();
-        // borg.set_led_value(Led::MainLed, !led_value).unwrap();
+        thread::sleep(Duration::from_millis(5));
+        // thread::sleep(Duration::from_millis(1000));
+        // borg.set_motor(Motor::Motor2, MotorPower::off()).unwrap();
+        // thread::sleep(Duration::from_millis(1000));
     }
 }
 
@@ -113,6 +138,6 @@ fn main2() {
         status.set_distance(d.map(|x| x as u64).map(Distance::from_mm));
     }
 
-    // status.join().unwrap();
-    // distance.join().unwrap();
+// status.join().unwrap();
+// distance.join().unwrap();
 }
