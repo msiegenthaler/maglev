@@ -174,10 +174,9 @@ module levitator(top=true, bottom=true) {
     if (top) {
       difference() {
         union() {
-          translate([0,duploRaster/2,0]) {
-            translate([0,0,-1]) duplo(dw,3,0, true, false);
-            translate([0,0,-duploHeight/2])
-              cube([dw*duploRaster-gapBetweenBricks, 3*duploRaster-gapBetweenBricks, duploHeight], center=true);
+          translate([0,duploRaster/2,-duploHeight/2]) {
+            translate([0,0,-0.15]) duplo(dw, 3, 1, true, false);
+            cube([dw*duploRaster-gapBetweenBricks, 3*duploRaster-gapBetweenBricks, duploHeight], center=true);
           }
         }
         translate([0,-duploRaster/2+0.2+0.5,-duploHeight-delta]) {
