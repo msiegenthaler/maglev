@@ -37,11 +37,11 @@ rail_solenoid_d = 19.5;
 //test_stripe();
 
 *levitator(top=false, bottom=true);
-levitator(top=true, bottom=false);
+*levitator(top=true, bottom=false);
 %translate([0,-duploRaster/2,-duploHeight-air_gap]) rotate([0,0,90]) {
   duplo_bottom(4,4);
 }
-*levitator_solenoid();
+levitator_solenoid();
 
 // plug_holder();
 
@@ -224,8 +224,8 @@ module levitator(top=true, bottom=true) {
 }
 
 module levitator_solenoid() {
-  translate([0,0,0]) rotate([0,90,0]) soleniod(len=rail_solenoid_l, outside_d=rail_solenoid_d, hole=3.95, left=true, connector=false);
-  translate([0,25,0]) rotate([0,90,0]) soleniod(len=rail_solenoid_l, outside_d=rail_solenoid_d, hole=3.95, left=false, connector=false);
+  translate([0,0,0]) rotate([0,90,0]) soleniod(len=rail_solenoid_l, outside_d=rail_solenoid_d, hole=5.95, left=true, connector=false);
+  translate([0,25,0]) rotate([0,90,0]) soleniod(len=rail_solenoid_l, outside_d=rail_solenoid_d, hole=5.95, left=false, connector=false);
 }
 
 // Duplo stick of size lenx1 that contains count magnets and attaches to the bottom
