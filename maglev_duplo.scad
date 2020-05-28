@@ -37,11 +37,11 @@ rail_solenoid_d = 19.5;
 //test_stripe();
 
 *levitator(top=false, bottom=true);
-*levitator(top=true, bottom=false);
+levitator(top=true, bottom=false);
 %translate([0,-duploRaster/2,-duploHeight-air_gap]) rotate([0,0,90]) {
   duplo_bottom(4,4);
 }
-levitator_solenoid();
+*levitator_solenoid();
 
 // plug_holder();
 
@@ -175,7 +175,10 @@ module levitator(top=true, bottom=true) {
       difference() {
         union() {
           translate([0,duploRaster/2,-duploHeight/2]) {
-            translate([0,0,-0.15]) duplo(dw, 3, 1, true, false);
+            translate([0,0,-0.15]) difference() {
+              duplo(dw, 3, 1, true, false);
+              translate([0,0,-1]) cube([dw*duploRaster-gapBetweenBricks+2*delta, 3*duploRaster-gapBetweenBricks+2*delta, duploHeight], center=true);
+            }
             cube([dw*duploRaster-gapBetweenBricks, 3*duploRaster-gapBetweenBricks, duploHeight], center=true);
           }
         }
