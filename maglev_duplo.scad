@@ -19,7 +19,7 @@ rail_solenoid_d = 19.5;
 
 
 // duplo_rail(4);
-// duplo_bottom(4, 4);
+duplo_bottom(4, 4);
 // duplo_top_straight(4, 3);
 // duplo_top_cross(2, 4);
 // duplo_top_cross(2, 2);
@@ -38,10 +38,10 @@ rail_solenoid_d = 19.5;
 
 *levitator(top=false, bottom=true);
 *levitator(top=true, bottom=false);
-%translate([0,-duploRaster/2,-duploHeight-air_gap]) rotate([0,0,90]) {
+*translate([0,-duploRaster/2,-duploHeight-air_gap]) rotate([0,0,90]) {
   duplo_bottom(4,4);
 }
-levitator_solenoid();
+*levitator_solenoid();
 
 // plug_holder();
 
@@ -233,7 +233,7 @@ module levitator_solenoid() {
 
 // Duplo stick of size lenx1 that contains count magnets and attaches to the bottom
 module duplo_bottom(len=4, count=3) {
-  mag_y = (duploRaster*len-gapBetweenBricks)/count;
+  mag_y = (duploRaster*len-gapBetweenBricks)/count-0.35;
   th = magnet_h+0.7+0.6;
   difference() {
     union() {
@@ -400,7 +400,7 @@ module test_stripe() {
 
 /** bar magnet */
 module magnet_pit(hole_l=0) {
-  gap_w=0.03; gap_l=0.15; gap_h=0.2;
+  gap_w=0.03; gap_l=0; gap_h=0.2;
   w = magnet_w+2*gap_w; l = magnet_l+2*gap_l*2; h = magnet_h+2*gap_h;
   teeth_inset = 0.5; teeth_width = 3; teeth_thickness = 0.3;
   tf_w = 1; tf_l = 0.0;
