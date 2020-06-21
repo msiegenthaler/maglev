@@ -36,12 +36,12 @@ duplo_bottom(4, 4);
 //magnet();
 //test_stripe();
 
-*levitator(top=false, bottom=true);
-*levitator(top=true, bottom=false);
-*translate([0,-duploRaster/2,-duploHeight-air_gap]) rotate([0,0,90]) {
-  duplo_bottom(4,4);
-}
-*levitator_solenoid();
+// levitator(top=false, bottom=true);
+// levitator(top=true, bottom=false);
+// %translate([0,-duploRaster/2,-duploHeight-air_gap]) rotate([0,0,90]) {
+  // duplo_bottom(4,4);
+// }
+// *levitator_solenoid();
 
 // plug_holder();
 
@@ -60,7 +60,7 @@ module levitator(top=true, bottom=true) {
   solenoid_x=-duploRaster+rail_solenoid_d/2+wall+0.2; solenoid_y=-0.1;
   solenoid_z=-air_gap-2; //aligned to middle of rail magnet
   solenoid_holder_t=3; solenoid_gap=gap+0.4;
-  levitator_magnet_count = 2;
+  levitator_magnet_count = 3;
 
   module basic_box() {
     comb_d = 4; comb_gap = .7; no_comb_l=wall*2; no_comb_h=7;
@@ -184,7 +184,7 @@ module levitator(top=true, bottom=true) {
         }
         translate([0,-duploRaster/2+0.2+0.5,-duploHeight-delta]) {
           for (i=[0:levitator_magnet_count-1]) {
-            translate([(duploRaster*dw-gapBetweenBricks)/levitator_magnet_count*((levitator_magnet_count-1)/2-i), 0, 0]) rotate([180,0,0]) magnet_pit();
+            translate([(duploRaster*dw-gapBetweenBricks)/levitator_magnet_count*((levitator_magnet_count-1)/2-i), 3, 0]) rotate([180,0,0]) magnet_pit();
           }
         }
         translate([0, l_d/2+side_gap, -duploHeight-l_h/2-delta]) {
@@ -235,6 +235,7 @@ module levitator_solenoid() {
 module duplo_bottom(len=4, count=3) {
   mag_y = (duploRaster*len-gapBetweenBricks)/count-0.35;
   th = magnet_h+0.7+0.6;
+  x_offset = 4;
   difference() {
     union() {
       translate([0,0,-6])
@@ -243,7 +244,7 @@ module duplo_bottom(len=4, count=3) {
         cube([duploRaster-gapBetweenBricks,duploRaster*len-gapBetweenBricks,th], center=true);
     }
     for (i=[0:count-1]) {
-      translate([0, +mag_y*((count-1)/2-i), delta]) magnet_pit();
+      translate([x_offset, +mag_y*((count-1)/2-i), delta+0.001]) magnet_pit(gap_l=0.025);
     }
   }
 }
@@ -399,8 +400,8 @@ module test_stripe() {
 }
 
 /** bar magnet */
-module magnet_pit(hole_l=0) {
-  gap_w=0.03; gap_l=0; gap_h=0.2;
+module magnet_pit(hole_l=0, gap_l=0.05) {
+  gap_w=0.03; gap_h=0.2;
   w = magnet_w+2*gap_w; l = magnet_l+2*gap_l*2; h = magnet_h+2*gap_h;
   teeth_inset = 0.5; teeth_width = 3; teeth_thickness = 0.3;
   tf_w = 1; tf_l = 0.0;
@@ -417,8 +418,6 @@ module magnet_pit(hole_l=0) {
           translate([(w-teeth_inset)/2-delta,-l/4,0]) cube([teeth_inset,tf_w,teeth_thickness], center=true);
           translate([(w-teeth_inset)/2-delta,0,0]) cube([teeth_inset,tf_w,teeth_thickness], center=true);
           translate([(w-teeth_inset)/2-delta,l/4,0]) cube([teeth_inset,tf_w,teeth_thickness], center=true);
-          translate([0,-(l-teeth_inset)/2-delta,0]) cube([tf_w,teeth_inset,teeth_thickness], center=true);
-          translate([0,(l-teeth_inset)/2+delta,0]) cube([tf_w,teeth_inset,teeth_thickness], center=true);
         }
       }
     }
